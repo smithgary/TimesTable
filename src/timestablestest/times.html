@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>SperrinGold Times Table Assessment</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <style scoped="">
+body {
+    background-color: white;
+    text-align: center;
+    color: black;
+    font-family: Arial, Helvetica, sans-serif;
+}
+</style>
+
+        <h1>Times Tables Assessment</h1>
+        <table>
+            <tr id="toggleRow">
+        <td>To test your times tables, 
+            <br>please enter the maximum number 
+            <br>(highest times table) you wish to test 
+            <br>- eg up to 12 times table:
+        </td>
+        <td><input id="tb1" type=number></td>  
+        <td><input id="createTable" type="button" value="Create New Table" onclick="startUp();"></td>
+        
+            </tr>
+        <tr>
+            <td><input id="generateQuestion" type="button" value="Generate Question" onclick="generateRandomQuestion();"></td>
+            <td><label id="questionText">Question Here</label></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Your Answer: <input id="answer" type=number></td>
+            <td><input id="submitAnswer" type="button" value="Check Answer" onclick="calculate();"></td>
+            <td></td>
+        </tr>
+        </table>
+        <table id="mytable"></table>
+        <br>
+        <label id="statusText">Status Here</label>
+        <div id="progressBar">
+            <div id="progBar"></div>
+        </div>
+<script type=text/javascript>
+    //Written by Gary Smith, copyright Sperringold.com, Metorsoftware.co.uk July 2018
+    //info@sperringold.com  
+    var currentI; 
+    var currentJ;
+    var indexCurrent;
+    var ans; 
+    var answers = new Array(); 
+    var passFail = new Array(); 
+    var asked = new Array();
+    var answeredInTime = new Array(); 
+    var sumCounted; 
+    var sumCorrect;
+    var percentageCounted; 
+    var percentageCorrect; 
+    var gridSize; 
+    function startUp(){
+        createTable();
+        var a = document.getElementById("tb1").value;
+        var row_num = parseInt(a) + 1;
+        gridSize = row_num;      
+        sumCounted = 0;
+        //initialise arrays
+        answers.push([0]);
+        passFail.push([false]);
+        asked.push([false]);
+        answeredInTime.push([true]);
+        
+        //Change this to 1,2,3,4,5,10
+        var primarySchoolTimes = new Array();
+        primarySchoolTimes.push(1,2,3,4,5,10);
+        
+        for(var i=0;i<gridSize;i++){ 
+      
+            answers[i] = new Array();
+            passFail[i] = new Array();
+            asked[i] = new Array();
+            answeredInTime[i] = new Array();
+            
+            answers[i].push([0]);
+            passFail[i].push(false);
+            asked[i].push(false);
+            answeredInTime[i].push(true);
+            
+            for (var j = 0; j < gridSize; j++) {
+                answers [i][j] = i * j;
+                passFail [i][j] = false;
+                asked [i][j] = false;
+                answeredInTime[i][j] = true;
+                }
+            )
+          }
+        }
+        
+    function initaliseTable(index){
+        for(var i=0;i<gridSize;i++){ 
+      
+            answers[i] = new Array();
+            passFail[i] = new Array();
+            asked[i] = new Array();
+            answeredInTime[i] = new Array();
+            
+            answers[i].push([0]);
+            passFail[i].push(false);
+            asked[i].push(false);
+            answeredInTime[i].push(true);
+            
+            for (var j = 0; j < gridSize; j++) {
+                answers [i][j] = i * j;
+                passFail [i][j] = false;
+                asked [i][j] = false;
+                answeredInTime[i][j] = true;
+                }
+            )
+          }
+    }
+    
+    function startQuestionTimer(i,j){
+        answeredInTime[i][j] = true;
+        var timerObj = setTimeout(tooLongToAnswer,12000,i,j);
+    }
+    function tooLongToAnswer(i,j){
+        if(i === currentI && j===currentJ){
+            answeredInTime[i][j] = false;
+        }
+    }
+     
+    function createTable(){
+                      
+    var a = document.getElementById("tb1").value;
+        if(a===""){
+            alert("Please enter some numeric values for table sizes");
+            }else{
+        row=new Array();
+        cell=new Array();
+        row_num=parseInt(a); 
+        cell_num = row_num;
+        tab=document.createElement('table');
+        tab.setAttribute('id','newtable');
+
+        tbo=document.createElement('tbody');
+
+        for(c=0;c<row_num;c++){
+            row[c]=document.createElement('tr');
+
+                for(k=0;k<cell_num;k++) {
+                    cell[k]=document.createElement('td');
+                    cont=document.createTextNode((c + ' x ' + k));
+                    cell[k].appendChild(cont);
+                    row[c].appendChild(cell[k]);
+                }
+            tbo.appendChild(row[c]);
+        }   
+        
+        tab.appendChild(tbo);
+        document.getElementById('mytable').appendChild(tab);
+        document.getElementById('createTable').style.visibility = 'hidden'; 
+        document.getElementById('toggleRow').style.visibility = 'hidden'; 
+        document.getElementById('toggleRow').style.height = 0;
+        }
+
+    }
+        function generateRandomQuestion(){
+            //Check that all questions haven't yet been asked..
+            calculateStatus();
+            if(sumCounted === asked.length * asked[0].length){
+                    return; 
+            }
+            var totalElement = asked.length * asked[0].length;
+            var selectedIndex = "";
+            var numberOfSelected = 1;
+            var uniqueCalcFound = false;
+            
+            outerloop:
+                    do{
+                        for(var indx=0; indx<numberOfSelected;indx++){
+                            
+                            var indexToSelect = Math.floor((Math.random()* totalElement));
+                            var tmpValOf = selectedIndex.indexOf(indexToSelect.valueOf());
+                            //JAVASCRIPT>>>
+                            //indexOf returns the position the position of the first occurence of a specified string in a string
+                            //, returns -1 if not found
+                            //valueOf returns the primitive value of a string..?
+                            //JAVA valueOf returns the string representation of the char, data etc. element
+                            while(selectedIndex.indexOf(indexToSelect.valueOf())>0){
+                                indexToSelect = Math.floor((Math.random()*totalElement));
+                            }
+                            
+                            selectedIndex = selectedIndex + indexToSelect;
+                            indexCurrent = indexToSelect; //Allow use by other functions.
+                            xIndex = Math.floor(indexToSelect/asked.length);
+                            yIndex = indexToSelect%asked.length;
+                            
+                            if(asked[xIndex][yIndex]===false){
+                                currentI = xIndex;
+                                currentJ = yIndex;
+                                document.getElementById("questionText").innerHTML = xIndex + ' X ' + yIndex;
+                                uniqueCalcFound = true; 
+                                startQuestionTimer(currentI,currentJ);
+                                break outerloop;
+                            }
+                        }
+                    }while (uniqueCalcFound !== true);
+        }
+        function calculateStatus(){
+            sumCounted = 0;
+            sumCorrect = 0;
+            for(var i=0;i<gridSize; i++){
+                for (var j=0;j<gridSize;j++){
+                    if(asked[i][j] === true){
+                        sumCounted ++;
+                    }
+                    if(passFail[i][j] === true){
+                        sumCorrect ++;
+                    }
+                }
+            }
+            percentageCounted = 100 * sumCounted / (asked.length * asked[0].length);
+            percentageCorrect = 100 * sumCorrect / (asked.length * asked[0].length);
+            
+            if(sumCounted === asked.length * asked[0].length){
+                document.getElementById("statusText").innerHTML = "All questions answered, well done! You got " + 
+                    percentageCorrect + " percent correct.";   
+            } else {
+                var statusTxt = document.getElementById("statusText").innerHTML;
+                document.getElementById("statusText").innerHTML = statusTxt + " <br> You've completed " + 
+                    percentageCounted + " percent so far.";
+            }
+        }
+        function calculate(){
+            ans = parseInt(document.getElementById("answer").value);
+            var successMessage;
+            var x = document.getElementById('mytable').getElementsByTagName('td');
+            asked[currentI][currentJ] = true;
+            if (ans === currentI * currentJ){
+                passFail[currentI][currentJ] = true;
+                if (answeredInTime[currentI][currentJ] === true){
+                    successMessage = "You are correct";
+                    //x[indexCurrent].style.backgroundColor = "green";
+                    x[indexCurrent].style.color = "green";
+                }else{
+                    successMessage = "You are correct, but you had to think about it!";
+                    //x[indexCurrent].style.backgroundColor = "orange"; 
+                    x[indexCurrent].style.color = "orange";
+                }
+                
+            } else{
+                successMessage = "You're wrong this time";
+                passFail[currentI][currentJ] = false;
+                //x[indexCurrent].style.backgroundColor = "red"; 
+                x[indexCurrent].style.color = "red";
+            }
+            //Now return successmessage
+            document.getElementById("statusText").innerHTML = successMessage;
+            //Clear text entry
+            document.getElementById("answer").value = "";
+            calculateStatus();
+            
+        }
+        
+</script>
+
+    </body>
+</html>
