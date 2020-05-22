@@ -26,10 +26,25 @@ body {
         <input id="changeColor" type="button" value="Change Cell Color" onclick="changeColour();">
         <input id="checkStartup" type="button" value="Check Startup" onclick="startUp();">
         <input id="generateQuestion" type="button" value="Generate Question" onclick="generateRandomQuestion();">
-        <br>Max number:
+        <input id="fillCheckBoxes" type="button" value="Fill Check Boxes" onclick="populateOptions();">
+        <input id="createTimesTable" type="button" value="Create times table" onclick="createTimesTable();">
+        createTimesTable
+        <!--
+        <br><br>Max number:
         <input id="tb1" type="text">
         Test:
         <input id="colr" type="text">
+        -->
+        <br><br>
+        Choose Which times tables to test for:
+        <br>
+        <div id="chkBoxes">
+        <input id="checkOpt2" type="checkbox" ><label for="checkOpt2">2 Times</label></body></br>
+        <input id="checkOpt3" type="checkbox" ><label for="checkOpt3">3 Times</label></body></br>
+        <input id="checkOpt4" type="checkbox" ><label for="checkOpt4">4 Times</label></body></br>
+        <input id="checkOpt5" type="checkbox" ><label for="checkOpt5">5 Times</label></body></br>
+        <input id="checkOpt10" type="checkbox" ><label for="checkOpt10">10 Times</label></body></br>
+        <br>
         <br>
         <input id="startQuestion" type="button" value="Ask Question" onclick="askQuestion();"> 
         <label id="questionText">Question Here</label>

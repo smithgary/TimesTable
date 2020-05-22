@@ -1,4 +1,6 @@
-
+/**
+ * Global variables, used across functions
+ */
     var currentI; //private Integer currentI;
     var currentJ; //private Integer currentJ;;
     var indexCurrent;
@@ -35,32 +37,55 @@
         }
             
     function testArray(){
-        //alert("Answers array : " + answers[8][9]);
-        //alert("PassFail array : " + passFail[8][9]);
-        //alert("Asked array: " + asked[8][9]);    
-        //alert("AnsweredInTime array: " + answeredInTime[8][9]); 
         generateRandomQuestion();
     }
+
     function askQuestion(){
-        
-        window.setTimeout(testArray, 8000);
-        
+        window.setTimeout(testArray, 12000);
     }
+
+    /**
+     * Adds the elements to the div for the options the user can select
+     */
+    function populateOptions(){
+        var options = ["2 Times", "3 Times", "4 Times", "5 Times", "6 Times", "7 Times", "8 Times", "9 Times", "10 Times", "11 Times", "12 Times"];
+        var optionsDiv = document.getElementById("chkBoxes");
+
+        for(var i=0; i < options.length; i++){
+            var checkBox = document.createElement("input");
+            var label = document.createElement("label");
+            checkBox.type = "checkbox";
+            checkBox.value = options[i];
+            optionsDiv.appendChild(checkBox);
+            optionsDiv.appendChild(label);
+            label.appendChild(document.createTextNode(options[i]));
+        }
+    }
+
     function answeredInTime(){
         //Called by timer, triggered when question is created and not answered within given time period
         answeredInTime[currentI][currentJ] = false;
     }
+    function createTimesTable(){
+        var selectedOptions = new Array();
+        var checkedOptions = document.getElementById("chkBoxes");
+        for(var k=0; k < checkedOptions.length; k++){
+            if (checkedOptions[k].checked === true){
+                selectedOptions.push(k);
+            }
+        }
+        document.getElementById("statusText").innerHTML =
+            "Selected Items: " + selectedOptions;
+    }
     function createTable(){
             //Written by Gary Smith, copyright Sperringold.com July 2018
             //info@sperringold.com
-            
+    let chosenTimesTables = new Array();
+
     var a = document.getElementById("tb1").value;
-    //var b = document.getElementById("tb2").value;
         if(a===""){
-        //if(a==="" || b===""){
             alert("Please enter some numeric values for table sizes");
             }else{
- 
  
         row=new Array();
         cell=new Array();
