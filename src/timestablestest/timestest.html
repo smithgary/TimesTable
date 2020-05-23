@@ -7,6 +7,7 @@ and open the template in the editor.
 <html>
     <head>
         <script src="timestablescript.js" type="text/javascript"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,28 +23,25 @@ body {
 </style>
 
         <h1>Times Tables Assessment</h1>
+        <!--
         <input id="clickMe" type="button" value="Create New Table" onclick="createTable();" >
         <input id="changeColor" type="button" value="Change Cell Color" onclick="changeColour();">
-        <input id="checkStartup" type="button" value="Check Startup" onclick="startUp();">
+        -->
         <input id="generateQuestion" type="button" value="Generate Question" onclick="generateRandomQuestion();">
+
         <input id="fillCheckBoxes" type="button" value="Fill Check Boxes" onclick="populateOptions();">
-        <input id="createTimesTable" type="button" value="Create times table" onclick="createTimesTable();">
-        createTimesTable
-        <!--
+        <input id="finaliseChoices" type="button" value="Finalise choices" onclick="finaliseChoices();">
+        <input id="addVisibleTable" type="button" value="Generate visible table" onclick="addVisibleTable();">
+        <input id="checkStartup" type="button" value="Check Startup" onclick="startUp();">
+
+
         <br><br>Max number:
         <input id="tb1" type="text">
-        Test:
-        <input id="colr" type="text">
-        -->
+
         <br><br>
         Choose Which times tables to test for:
         <br>
-        <div id="chkBoxes">
-        <input id="checkOpt2" type="checkbox" ><label for="checkOpt2">2 Times</label></body></br>
-        <input id="checkOpt3" type="checkbox" ><label for="checkOpt3">3 Times</label></body></br>
-        <input id="checkOpt4" type="checkbox" ><label for="checkOpt4">4 Times</label></body></br>
-        <input id="checkOpt5" type="checkbox" ><label for="checkOpt5">5 Times</label></body></br>
-        <input id="checkOpt10" type="checkbox" ><label for="checkOpt10">10 Times</label></body></br>
+        <div id="chkBoxes"></div>
         <br>
         <br>
         <input id="startQuestion" type="button" value="Ask Question" onclick="askQuestion();"> 
@@ -51,7 +49,7 @@ body {
         <input id="answer" type=number>
         <input id="submitAnswer" type="button" value="Check Answer" onclick="calculate();">
         <table id="mytable"></table>
-        <br>
+        <br><br>
         <label id="statusText">Status Here</label>
     </body>
     
