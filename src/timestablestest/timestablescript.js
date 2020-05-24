@@ -7,11 +7,10 @@
     //s.onload = function(e){alert("loaded")}
     document.head.appendChild(s);
     document.head.innerHTML += "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>";
-
+    document.title = "Times table by Gary";
     /**
      * Global variables, used across functions
      */
-    let allQuestions;
     let maxTimes;
     let outStandingQuestions = [];
     let currentI; //private Integer currentI;
@@ -56,6 +55,7 @@ function startUp(){
                     rangeMultiple: jOffset,
                     correctAnswer: selectedOptions[i] * jOffset,
                     responseAnswer: 0,
+                    asked: false,
                     answered: false,
                     answeredInTime: false,
                     answeredCorrectly: false};
@@ -97,6 +97,7 @@ function startUp(){
 
     // function answeredInTime(){
     //     //Called by timer, triggered when question is created and not answered within given time period
+    //     //get active question;
     //     answeredInTime[currentI][currentJ] = false;
     // }
 
@@ -189,27 +190,54 @@ function changeColour(){
 //     let totalElements = asked.length * asked[0].length;
 // }
 function generateQuestionFromUnanswered(){
-    //Filter through outStandingQuestions, filter out for
-    //outStandingQuestions.map()
-    let unanswered = outStandingQuestions.map(function(q){
-        return q => q.answered = false;
-    });
-    let randomQuestion = getRandomItem(outStandingQuestions);
-    console.log(randomQuestion);
-    let mKId = randomQuestion.mapKey;
-    console.log(mKId);
-    //outStandingQuestions.set()
-    document.getElementById("questionText").innerHTML = randomQuestion.optionMultiple + ' X ' + randomQuestion.rangeMultiple;
+    let qsRemaining = getNumberOfRemainingQuestions();
+    if (qsRemaining > 0) {
+        //Get a random question from a filtered list, where asked is false
+        let randomQuestion = getRandomItem(outStandingQuestions.filter(function (question) {
+            return question.asked === false;
+        }));
+        console.log(randomQuestion);
+
+        let mKId = randomQuestion.mapKey;
+        console.log(mKId);
+        //Set outStandingQuestions, with mapKey = mkId, asked = true;
+
+        document.getElementById("questionText").innerHTML = randomQuestion.optionMultiple + ' X ' + randomQuestion.rangeMultiple;
+
+        //Update outStandingQuestions, set asked = true.
+        let found = outStandingQuestions.find(element => element.mapKey === mKId);
+        found.asked = true;
+        let foundIndex = outStandingQuestions.findIndex(element => element.mapKey === mKId);
+        console.log(foundIndex);
+        outStandingQuestions[foundIndex] = found;
+
+        qsRemaining = getNumberOfRemainingQuestions();
+
+        console.log(qsRemaining);
+        //Begin timer for 8s, upon which time call function to set answeredInTime to false;
+        //window.setTimeout(answeredInTime, 8000);
+    }else
+    {
+        document.getElementById("questionText").innerHTML = 'All Questions answered';
+    }
         /*
         mapKey: mapKeyId,
                     optionMultiple: selectedOptions[i],
                     rangeMultiple: jOffset,
                     correctAnswer: selectedOptions[i] * jOffset,
                     responseAnswer: 0,
+                    asked: false,
                     answered: false,
                     answeredInTime: false,
                     answeredCorrectly: false};
          */
+}
+
+
+function getNumberOfRemainingQuestions(){
+    return outStandingQuestions.filter(function(question){
+        return question.asked === false;
+    }).length
 }
 function getRandomItem(set) {
     let items = Array.from(set);
