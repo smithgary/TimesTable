@@ -13,7 +13,7 @@
      */
     let allQuestions;
     let maxTimes;
-    let outStandingQuestions = new Map();
+    let outStandingQuestions = [];
     let currentI; //private Integer currentI;
 let currentJ; //private Integer currentJ;;
 let indexCurrent;
@@ -48,13 +48,10 @@ function startUp(){
             //asked.push([false]);
             //answeredInTime.push([false]);
             for (let j = 0; j < maxTimes; j++) {
-                //answers [i][j] = selectedOptions[i] * j;    //won't need
-                //passFail [i][j] = false;                    //won't need
-                //asked [i][j] = false;                       //won't need
-                //answeredInTime[i][j] = false;               //won't need
                 jOffset = j + 1;
-                mapKey = selectedOptions[i] + "_" + jOffset;
+                mapKeyId = selectedOptions[i] + "_" + jOffset;
                 let q = {
+                    mapKey: mapKeyId,
                     optionMultiple: selectedOptions[i],
                     rangeMultiple: jOffset,
                     correctAnswer: selectedOptions[i] * jOffset,
@@ -63,17 +60,9 @@ function startUp(){
                     answeredInTime: false,
                     answeredCorrectly: false};
 
-
-                outStandingQuestions.set(mapKey, q);
-
-                //strgOut += "<br/>" + selectedOptions[i] + " times " + j + " is: " + answers[i][j];
+                outStandingQuestions.push(q);
             }
     }
-    //allQuestions = Object.assign({}, outStandingQuestions);
-    //For test..
-    //strgOut += "<br/>" + "Total Questions : " + selectedOptions.length * maxTimes;
-    //strgOut += outStandingQuestions.entries().next().value;
-    //document.getElementById("statusText").innerHTML = strgOut;
 }
             
     function testArray(){
@@ -199,7 +188,33 @@ function changeColour(){
 // function getTotalQuestions(){
 //     let totalElements = asked.length * asked[0].length;
 // }
-
+function generateQuestionFromUnanswered(){
+    //Filter through outStandingQuestions, filter out for
+    //outStandingQuestions.map()
+    let unanswered = outStandingQuestions.map(function(q){
+        return q => q.answered = false;
+    });
+    let randomQuestion = getRandomItem(outStandingQuestions);
+    console.log(randomQuestion);
+    let mKId = randomQuestion.mapKey;
+    console.log(mKId);
+    //outStandingQuestions.set()
+    document.getElementById("questionText").innerHTML = randomQuestion.optionMultiple + ' X ' + randomQuestion.rangeMultiple;
+        /*
+        mapKey: mapKeyId,
+                    optionMultiple: selectedOptions[i],
+                    rangeMultiple: jOffset,
+                    correctAnswer: selectedOptions[i] * jOffset,
+                    responseAnswer: 0,
+                    answered: false,
+                    answeredInTime: false,
+                    answeredCorrectly: false};
+         */
+}
+function getRandomItem(set) {
+    let items = Array.from(set);
+    return items[Math.floor(Math.random() * items.length)];
+}
 function generateRandomQuestion(){
     let totalElement = selectedOptions.length * maxTimes;
     let selectedIndex = "";
