@@ -13,60 +13,47 @@
      */
     let maxTimes;
     let outStandingQuestions = [];
-    let currentI; //private Integer currentI;
-let currentJ; //private Integer currentJ;;
-let indexCurrent;
-// let ans; //private Integer ans;
-let questionOptions = []; //holds the numbers to choose from // 2020-05-23
-let selectedOptions = []; // holds the list of chosen numbers to use // 2020-05-23
-let answers = [[],[]]; //private Integer [][] answers;
-let passFail = [[],[]]; //private Boolean [][] passFail;
-let asked = [[],[]]; //private Boolean [][] asked;
-let answeredInTime = [[],[]]; //private Boolean [][] answeredInTime;
+    let currentQuestionId;
+    let timeLimit = 8000;
 
-let sumCounted; //private Double sumCounted;
-// let sumCorrect;
-// let percentageCounted; //private Double percentageCounted;
-// let percentageCorrect; //private Double percentageCorrect;
-//
-// let gridSize; //private Integer gridSize;
+    let questionOptions = []; //holds the numbers to choose from // 2020-05-23
+    let selectedOptions = []; // holds the list of chosen numbers to use // 2020-05-23
+
 
 /**
  * Initialise the data arrays holding information.
  * Needs to be called by populateOptions, once the details of the rows is known
  */
 function startUp(){
-    sumCounted = 0; //what's this?
-    let strgOut = ""; // for test
-    let mapKey = "";
-    //initialise arrays
 
-    for(let i=0;i<selectedOptions.length;i++){
-            //answers.push([0]);
-            //passFail.push([false]);
-            //asked.push([false]);
-            //answeredInTime.push([false]);
-            for (let j = 0; j < maxTimes; j++) {
-                jOffset = j + 1;
-                mapKeyId = selectedOptions[i] + "_" + jOffset;
-                let q = {
-                    mapKey: mapKeyId,
-                    optionMultiple: selectedOptions[i],
-                    rangeMultiple: jOffset,
-                    correctAnswer: selectedOptions[i] * jOffset,
-                    responseAnswer: 0,
-                    asked: false,
-                    answered: false,
-                    answeredInTime: false,
-                    answeredCorrectly: false};
+    let mapKeyId;
+    let jOffset;
+    for (let i = 0; i < selectedOptions.length; i++) {
 
-                outStandingQuestions.push(q);
-            }
+        for (let j = 0; j < maxTimes; j++) {
+            jOffset = j + 1;
+            mapKeyId = selectedOptions[i] + "_" + jOffset;
+            let q = {
+                mapKey: mapKeyId,
+                optionMultiple: selectedOptions[i],
+                rangeMultiple: jOffset,
+                correctAnswer: selectedOptions[i] * jOffset,
+                responseAnswer: 0,
+                asked: false,
+                answered: false,
+                answeredStart: new Date(),
+                answeredEnd: new Date(),
+                answeredInTime: false,
+                answeredCorrectly: false
+            };
+            outStandingQuestions.push(q);
+        }
     }
 }
             
     function testArray(){
-        generateRandomQuestion();
+        //generateRandomQuestion();
+        generateQuestionFromUnanswered();
     }
 
     function askQuestion(){
@@ -95,17 +82,12 @@ function startUp(){
         }
     }
 
-    // function answeredInTime(){
-    //     //Called by timer, triggered when question is created and not answered within given time period
-    //     //get active question;
-    //     answeredInTime[currentI][currentJ] = false;
-    // }
-
 /**
  * Add chosen items to array of selectedOptions
  * Created 23rd May 2020
  */
 function finaliseChoices(){
+    //TODO replace with dynamic fill
     questionOptions[2] = document.getElementById("chkBoxTimes2");
     questionOptions[3] = document.getElementById("chkBoxTimes3");
     questionOptions[4] = document.getElementById("chkBoxTimes4");
@@ -199,6 +181,8 @@ function generateQuestionFromUnanswered(){
         console.log(randomQuestion);
 
         let mKId = randomQuestion.mapKey;
+        //Set the 'global' variable for the current question
+        currentQuestionId = mKId;
         console.log(mKId);
         //Set outStandingQuestions, with mapKey = mkId, asked = true;
 
@@ -206,7 +190,9 @@ function generateQuestionFromUnanswered(){
 
         //Update outStandingQuestions, set asked = true.
         let found = outStandingQuestions.find(element => element.mapKey === mKId);
+        found = getCurrentQuestion();
         found.asked = true;
+        found.answeredStart = new Date();
         let foundIndex = outStandingQuestions.findIndex(element => element.mapKey === mKId);
         console.log(foundIndex);
         outStandingQuestions[foundIndex] = found;
@@ -214,23 +200,10 @@ function generateQuestionFromUnanswered(){
         qsRemaining = getNumberOfRemainingQuestions();
 
         console.log(qsRemaining);
-        //Begin timer for 8s, upon which time call function to set answeredInTime to false;
-        //window.setTimeout(answeredInTime, 8000);
     }else
     {
         document.getElementById("questionText").innerHTML = 'All Questions answered';
     }
-        /*
-        mapKey: mapKeyId,
-                    optionMultiple: selectedOptions[i],
-                    rangeMultiple: jOffset,
-                    correctAnswer: selectedOptions[i] * jOffset,
-                    responseAnswer: 0,
-                    asked: false,
-                    answered: false,
-                    answeredInTime: false,
-                    answeredCorrectly: false};
-         */
 }
 
 
@@ -243,104 +216,64 @@ function getRandomItem(set) {
     let items = Array.from(set);
     return items[Math.floor(Math.random() * items.length)];
 }
-function generateRandomQuestion(){
-    let totalElement = selectedOptions.length * maxTimes;
-    let selectedIndex = "";
-    let numberOfSelected = 1;
-    let uniqueCalcFound = false;
-    outerloop:
-        do{
-            for(let indx=0; indx<numberOfSelected; indx++){
-                let indexToSelect = Math.floor((Math.random() * totalElement));
-                const tmpValOf = selectedIndex.indexOf(indexToSelect.valueOf());
-                //JAVASCRIPT>>>
-                //indexOf returns the position the position of the first occurence of a specified string in a string
-                //, returns -1 if not found
-                //valueOf returns the primitive value of a string..?
-                //JAVA valueOf returns the string representation of the char, data etc. element
-                while(selectedIndex.indexOf(indexToSelect.valueOf())>0){
-                    indexToSelect = Math.floor((Math.random()*totalElement));
-                }
+function calculate(){
+    let ans = document.getElementById("answer").value;
 
-                selectedIndex = selectedIndex + indexToSelect;
-                indexCurrent = indexToSelect; //Allow use by other functions.
-                xIndex = Math.floor(indexToSelect/asked.length);
-                yIndex = indexToSelect%asked.length;
-                document.getElementById("statusText").innerHTML =
-                    "Total Elements: " + totalElement +
-                    ", Asked.Length: " + asked.length +
-                    ", Asked[0].Length: " + asked[0].length +
-                    ", XIndex: " + xIndex +
-                    ", YIndex: " + yIndex +
-                    ", SelectedIndex: " + selectedIndex +
-                    ", IndexToSelect: " + indexToSelect +
-                    ", ValOf: " + tmpValOf;
-                //alert("Fist and Second are: " + xIndex + " " + yIndex);
-                if(asked[xIndex][yIndex]===false){
-                    currentI = xIndex;
-                    currentJ = yIndex;
-
-                    document.getElementById("questionText").innerHTML = xIndex + ' X ' + yIndex;
-                    uniqueCalcFound = true;
-                    //Begin timer for 8s, upon which time call function to set answeredInTime to false;
-                    window.setTimeout(answeredInTime, 8000);
-                    break outerloop;
-                }
-            }
-        }while (uniqueCalcFound !== true);
+    let x = document.getElementById('mytable').getElementsByTagName('td');
+    //Get the current question being answered
+    let found = getCurrentQuestion();
+        found.answered = true;
+        found.answeredEnd = new Date();
+        found.responseAnswer = parseInt(ans);
+        let timeToAnswer = found.answeredEnd - found.answeredStart;
+            if (timeToAnswer <= timeLimit){found.answeredInTime = true}
+            if (parseInt(ans) === found.correctAnswer){found.answeredCorrectly = true}
+    let foundIndex = getCurrentIndex();
+        console.log(foundIndex);
+        outStandingQuestions[foundIndex] = found;
+        console.log(outStandingQuestions[foundIndex]);
+    updateStatus();
+    clearResponse();
 }
 
-// function generateRandomQuestion(){
-//     var totalElement = asked.length * asked[0].length;
-//     var selectedIndex = "";
-//     var numberOfSelected = 1;
-//     var uniqueCalcFound = false;
-//     outerloop:
-//             do{
-//                 for(var indx=0; indx<numberOfSelected;indx++){
-//                     //if(sumCounted>(gridSize * gridSize -2)){
-//                     //alert("Reached second from last");
-//                     //break outerloop;
-//                     //}
-//
-//                     var indexToSelect = Math.floor((Math.random()* totalElement));
-//                     var tmpValOf = selectedIndex.indexOf(indexToSelect.valueOf());
-//                     //JAVASCRIPT>>>
-//                     //indexOf returns the position the position of the first occurence of a specified string in a string
-//                     //, returns -1 if not found
-//                     //valueOf returns the primitive value of a string..?
-//                     //JAVA valueOf returns the string representation of the char, data etc. element
-//                     while(selectedIndex.indexOf(indexToSelect.valueOf())>0){
-//                         indexToSelect = Math.floor((Math.random()*totalElement));
-//                     }
-//
-//                     selectedIndex = selectedIndex + indexToSelect;
-//                     indexCurrent = indexToSelect; //Allow use by other functions.
-//                     xIndex = Math.floor(indexToSelect/asked.length);
-//                     yIndex = indexToSelect%asked.length;
-//                     document.getElementById("statusText").innerHTML =
-//                             "Total Elements: " + totalElement +
-//                             ", Asked.Length: " + asked.length +
-//                             ", Asked[0].Length: " + asked[0].length +
-//                             ", XIndex: " + xIndex +
-//                             ", YIndex: " + yIndex +
-//                             ", SelectedIndex: " + selectedIndex +
-//                             ", IndexToSelect: " + indexToSelect +
-//                             ", ValOf: " + tmpValOf;
-//                     //alert("Fist and Second are: " + xIndex + " " + yIndex);
-//                     if(asked[xIndex][yIndex]===false){
-//                         currentI = xIndex;
-//                         currentJ = yIndex;
-//
-//                         document.getElementById("questionText").innerHTML = xIndex + ' X ' + yIndex;
-//                         uniqueCalcFound = true;
-//                         //Begin timer for 8s, upon which time call function to set answeredInTime to false;
-//                         window.setTimeout(answeredInTime, 8000);
-//                         break outerloop;
-//                     }
-//                 }
-//             }while (uniqueCalcFound !== true);
-// }
+function updateStatus(){
+    /**
+     * Use current question. getCurrentQuestion();
+     * Update successMessage, post into status
+     * Update % complete, % correct, add to status
+     * Update grid.
+     */
+    let msgDestination = document.getElementById("statusText").innerHTML;
+    let found = getCurrentQuestion();
+    if (found.answeredCorrectly && found.answeredInTime){msgDestination = "Question not yet answered";}
+    if (found.answeredCorrectly && !found.answeredInTime){msgDestination = "Correct, just took a bit longer";}
+    let numberAnswered = outStandingQuestions.length - getNumberOfRemainingQuestions();
+    let percentageAnswered = 100 * numberAnswered / outStandingQuestions.length;
+    let numberCorrect = outStandingQuestions.filter(function (question) {
+        return question.answeredCorrectly === true;
+    }).length;
+    let percentageCorrect = 100 * numberCorrect / outStandingQuestions.length;
+    let successMessage = "Answered: " + numberAnswered + ", " + percentageAnswered + "complete. <br> Correct: " + numberCorrect + ", " + percentageCorrect + " perc";
+    if (found.answered != true)
+        {
+            document.getElementById("statusText").innerHTML = "Question not yet answered"
+        }else
+            {
+                document.getElementById("statusText").innerHTML = successMessage
+            };
+}
+
+function getCurrentQuestion(){
+    let found = outStandingQuestions.find(element => element.mapKey === currentQuestionId);
+    return found;
+}
+function getCurrentIndex(){
+    let foundIndex = outStandingQuestions.findIndex(element => element.mapKey === currentQuestionId);
+    return foundIndex;
+}
+function clearResponse(){
+    document.getElementById("answer").value = "";
+}
 
 // function calculateStatus(){
 //     sumCounted = 0;
