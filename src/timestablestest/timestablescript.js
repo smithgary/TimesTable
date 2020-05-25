@@ -243,24 +243,20 @@ function updateStatus(){
      * Update % complete, % correct, add to status
      * Update grid.
      */
-    let msgDestination = document.getElementById("statusText").innerHTML;
+    let outputMessage;
     let found = getCurrentQuestion();
-    if (found.answeredCorrectly && found.answeredInTime){msgDestination = "Question not yet answered";}
-    if (found.answeredCorrectly && !found.answeredInTime){msgDestination = "Correct, just took a bit longer";}
+    if (found.answeredCorrectly && found.answeredInTime){outputMessage = "Correct!, well done!";}
+    if (found.answeredCorrectly && !found.answeredInTime){outputMessage = "Correct, just took a bit longer";}
+    if (!found.answeredCorrectly){outputMessage = "Sorry, wrong answer";}
     let numberAnswered = outStandingQuestions.length - getNumberOfRemainingQuestions();
     let percentageAnswered = 100 * numberAnswered / outStandingQuestions.length;
     let numberCorrect = outStandingQuestions.filter(function (question) {
         return question.answeredCorrectly === true;
     }).length;
     let percentageCorrect = 100 * numberCorrect / outStandingQuestions.length;
-    let successMessage = "Answered: " + numberAnswered + ", " + percentageAnswered + "complete. <br> Correct: " + numberCorrect + ", " + percentageCorrect + " perc";
-    if (found.answered != true)
-        {
-            document.getElementById("statusText").innerHTML = "Question not yet answered"
-        }else
-            {
-                document.getElementById("statusText").innerHTML = successMessage
-            };
+    let successMessage = outputMessage + "<br>Answered: " + numberAnswered + ", " + percentageAnswered + "complete. <br> Correct: " + numberCorrect + ", " + percentageCorrect + " perc";
+    if (found.answered === false) { document.getElementById("statusText").innerHTML = "Question not yet answered"}
+    if (found.answered === true) { document.getElementById("statusText").innerHTML = successMessage };
 }
 
 function getCurrentQuestion(){
@@ -274,23 +270,6 @@ function getCurrentIndex(){
 function clearResponse(){
     document.getElementById("answer").value = "";
 }
-
-// function calculateStatus(){
-//     sumCounted = 0;
-//     sumCorrected = 0;
-//     for(var i=0;i<gridSize; i++){
-//         for (var j=0;j<gridSize;j++){
-//             if(asked[i][j] === true){
-//                 sumCounted ++;
-//             }
-//             if(passFail[i][j] === true){
-//                 sumCorrect ++;
-//             }
-//         }
-//     }
-//     percentageCounted = 100 * sumCounted / (asked.length * asked[0].length);
-//     percentageCorrect = 100 * sumCorrect / (asked.length * asked[0].length);
-// }
 
 // function calculate(){
 //     ans = document.getElementById("answer").value;
