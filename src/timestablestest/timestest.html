@@ -24,33 +24,29 @@ body {
 </style>
 
         <h1>Times Tables Assessment</h1>
-        <!--
-        <input id="clickMe" type="button" value="Create New Table" onclick="createTable();" >
-        <input id="changeColor" type="button" value="Change Cell Color" onclick="changeColour();">
-        -->
-        <input id="fillCheckBoxes" type="button" value="Fill Check Boxes" onclick="populateOptions();">
-        <input id="finaliseChoices" type="button" value="Finalise choices" onclick="finaliseChoices();">
-        <input id="addVisibleTable" type="button" value="Generate visible table" onclick="addVisibleTable();">
-        <input id="checkStartup" type="button" value="Check Startup" onclick="startUp();">
-        <input id="genQuestion" type="button" value="Gen Question" onclick="generateQuestionFromUnanswered();">
+        <div id="initialChoices" style="display: table-cell; vertical-align: middle">
+            Choose Which times tables to test for:
+            <br/><br/>
+            <div id="chkBoxes"></div>
+            <br/><br/>
+            <br><br>Max number to multiply by:
+            <input id="maxNumber" type="number">
+            <br/><br/>
+        <input id="finaliseChoices" type="button" value="Prepare Test" onclick="finaliseChoices();">
+        </div>
+        <br/><br/>
 
 
-        <br><br>Max number:
-        <input id="tb1" type="text">
-
-        <br><br>
-        Choose Which times tables to test for:
-        <br>
-        <div id="chkBoxes"></div>
-        <br>
-        <br>
-        <label id="questionText">Question Here</label>
+        <br/><br/>
+        <input id="genQuestion" type="button" value="Start First Question" onclick="generateQuestionFromUnanswered();">
+        <br/><br/>
+        <label id="questionText"></label>
         <input id="answer" type=number>
         <input id="submitAnswer" type="button" value="Check Answer" onclick="calculate();">
         <br><br>
         <table id="mytable" align="centre"></table>
         <br><br>
-        <label id="statusText">Status Here</label>
+        <label id="statusText"></label>
         <div id="questionProgressBar">
             <div id="myBar"></div>
         </div>

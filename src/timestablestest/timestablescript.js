@@ -1,13 +1,17 @@
 /**
+ * Written by Gary Smith, gary@meteorsoftware.co.uk
  * Load in jQuery
  * @type {HTMLScriptElement}
  */
     var s = document.createElement("script");
     s.src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js";
-    //s.onload = function(e){alert("loaded")}
+    s.onload = function(e){
+        populateOptions()
+    };
     document.head.appendChild(s);
     document.head.innerHTML += "<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>";
     document.title = "Times table by Gary";
+
     /**
      * Global variables, used across functions
      */
@@ -50,37 +54,30 @@ function startUp(){
         }
     }
 }
-            
-    function testArray(){
-        //generateRandomQuestion();
-        generateQuestionFromUnanswered();
-    }
 
-    function askQuestion(){
-        window.setTimeout(testArray, 12000);
-    }
+/**
+ * Adds the elements to the div for the options the user can select
+ * Created 23rd May 2020
+ */
+function populateOptions(){
+    var options = ["2 Times", "3 Times", "4 Times", "5 Times", "6 Times", "7 Times", "8 Times", "9 Times", "10 Times", "11 Times", "12 Times"];
+    var optionsDiv = document.getElementById("chkBoxes");
 
-    /**
-     * Adds the elements to the div for the options the user can select
-     * Created 23rd May 2020
-     */
-    function populateOptions(){
-        var options = ["2 Times", "3 Times", "4 Times", "5 Times", "6 Times", "7 Times", "8 Times", "9 Times", "10 Times", "11 Times", "12 Times"];
-        var optionsDiv = document.getElementById("chkBoxes");
-
-        for(var i=0; i < options.length; i++){
-            var checkBox = document.createElement("input");
-            var label = document.createElement("label");
-            var idLbl = document.createElement("id");
-            checkBox.type = "checkbox";
-            checkBox.value = options[i];
-            checkBox.id = "chkBoxTimes" + (i + 2);
-            optionsDiv.appendChild(checkBox);
-            optionsDiv.appendChild(label);
-            optionsDiv.appendChild(idLbl);
-            label.appendChild(document.createTextNode(options[i]));
-        }
+    for(var i=0; i < options.length; i++){
+        var checkBox = document.createElement("input");
+        var label = document.createElement("label");
+        var idLbl = document.createElement("id");
+        checkBox.type = "checkbox";
+        checkBox.value = options[i];
+        checkBox.id = "chkBoxTimes" + (i + 2);
+        optionsDiv.appendChild(checkBox);
+        optionsDiv.appendChild(label);
+        optionsDiv.appendChild(idLbl);
+        label.appendChild(document.createTextNode(options[i]));
     }
+    document.getElementById("initialChoices").style.display = "block";
+    document.getElementById("maxNumber").value = 12;
+}
 
 /**
  * Add chosen items to array of selectedOptions
@@ -100,7 +97,8 @@ function finaliseChoices(){
     questionOptions[11] = document.getElementById("chkBoxTimes11");
     questionOptions[12] = document.getElementById("chkBoxTimes12");
 
-    maxTimes = 12; //document.getElementById("tb1").value;
+    let maxEntered = document.getElementById("maxNumber").value;
+    maxTimes = parseInt(maxEntered);
 
     let maxTimesOffset = maxTimes + 1;
     let indx = 0;
@@ -109,15 +107,13 @@ function finaliseChoices(){
          if (questionOptions[k].checked){
              selectedOptions[indx]=k;
              indx += 1;
-             strg += k + " "; //used for testing
+
          }
      }
-    //Remove this
-    document.getElementById("statusText").innerHTML = "No of Selected Items: " + selectedOptions.length
-    + ", which were: " + strg;
-     //to here.. used for testing
-    //Initialise the data for background calculations as well.
-    //startUp();
+    //Hide the div where initial choices were made.
+     document.getElementById("initialChoices").style.display = "none";
+
+    addVisibleTable();
 }
 
 /**
@@ -125,12 +121,10 @@ function finaliseChoices(){
  * Created 23rd May 2020
  */
 function addVisibleTable(){
-    let tab; //table
-    let tbo; //table body
-    let row; //table row
-    let cell; // cell within row
-
-    let tableId;    // id for cell for easy reference later (background colour etc.)
+    let tab;
+    let tbo;
+    let row;
+    let cell;
     if (selectedOptions.length > 0) {
         row = [];
         cell = [];
@@ -156,23 +150,13 @@ function addVisibleTable(){
 
         tab.appendChild(tbo);
         document.getElementById('mytable').appendChild(tab);
+        document.getElementById("mytable").style.display = "block";
     } else {
         alert("Please choose which times tables to display");
     }
+    startUp();
 }
 
-function changeColour(){
-    //Written by Gary Smith copyright Sperringold.com
-    var b = document.getElementById("colr").value;
-    var x = document.getElementById('mytable').getElementsByTagName('td');
-    if(b < 10) x[b].style.backgroundColor = "yellow";
-    if(b < 20 && b > 10) x[b].style.backgroundColor = "green";
-    if(b > 20) x[b].style.backgroundColor = "red";
-
-}
-// function getTotalQuestions(){
-//     let totalElements = asked.length * asked[0].length;
-// }
 function generateQuestionFromUnanswered(){
     let qsRemaining = getNumberOfRemainingQuestions();
     if (qsRemaining > 0) {
@@ -205,9 +189,11 @@ function generateQuestionFromUnanswered(){
     }else
     {
         document.getElementById("questionText").innerHTML = 'All Questions answered';
+        //Hide 'check answer button
+        document.getElementById("submitAnswer").style.display = "none";
+        // Add option to email data to parent!
     }
 }
-
 
 function getNumberOfRemainingQuestions(){
     return outStandingQuestions.filter(function(question){
@@ -236,6 +222,9 @@ function calculate(){
         console.log(outStandingQuestions[foundIndex]);
     updateStatus();
     clearResponse();
+    generateQuestionFromUnanswered();
+    //hide 'Next question' button.
+    document.getElementById("genQuestion").style.display = "none";
 }
 
 function updateStatus(){
@@ -268,7 +257,7 @@ function updateStatus(){
         return question.answeredCorrectly === true;
     }).length;
     let percentageCorrect = 100 * numberCorrect / outStandingQuestions.length;
-    let successMessage = outputMessage + "<br>Answered: " + numberAnswered + ", " + percentageAnswered + "complete. <br> Correct: " + numberCorrect + ", " + percentageCorrect + " perc";
+    let successMessage = outputMessage; //+ "<br>Answered: " + numberAnswered + ", " + percentageAnswered + "complete. <br> Correct: " + numberCorrect + ", " + percentageCorrect + " perc";
     if (found.answered === false) { document.getElementById("statusText").innerHTML = "Question not yet answered"}
     if (found.answered === true) { document.getElementById("statusText").innerHTML = successMessage };
     let elem = document.getElementById("myBar");
@@ -279,31 +268,8 @@ function getTableCell(){
     let found = getCurrentQuestion();
     let tableCell = document.getElementById(found.mapKey);
     return tableCell;
-
-    // let b = document.getElementById("colr").value;
-    // let x = document.getElementById('mytable').getElementsByTagName('td');
-    // if(b < 10) x[b].style.backgroundColor = "yellow";
-    // if(b < 20 && b > 10) x[b].style.backgroundColor = "green";
-    // if(b > 20) x[b].style.backgroundColor = "red";
 }
-// var i = 0;
-// function move() {
-//     if (i == 0) {
-//         i = 1;
-//         var elem = document.getElementById("myBar");
-//         var width = 1;
-//         var id = setInterval(frame, 10);
-//         function frame() {
-//             if (width >= 100) {
-//                 clearInterval(id);
-//                 i = 0;
-//             } else {
-//                 width++;
-//                 elem.style.width = width + "%";
-//             }
-//         }
-//     }
-// }
+
 function getCurrentQuestion(){
     let found = outStandingQuestions.find(element => element.mapKey === currentQuestionId);
     return found;
@@ -315,26 +281,3 @@ function getCurrentIndex(){
 function clearResponse(){
     document.getElementById("answer").value = "";
 }
-
-// function calculate(){
-//     ans = document.getElementById("answer").value;
-//     var successMessage;
-//     var x = document.getElementById('mytable').getElementsByTagName('td');
-//     asked[currentI][currentJ] = true;
-//     //answerTimer.stop();
-//     if (ans === currentI * currentJ){
-//         passFail[currentI][currentJ] = true;
-//         if (answeredInTime[currentI][currentJ] === true){
-//             successMessage = "You are correct";
-//             x[indexCurrent].style.backgroundColor = "green";
-//         }else{
-//             successMessage = "You are correct, but you had to think about it!";
-//             x[indexCurrent].style.backgroundColor = "orange";
-//         }
-//
-//     } else{
-//         successMessage = "You're wrong this time";
-//         passFail[currentI][currentJ] = false;
-//         x[indexCurrent].style.backgroundColor = "red";
-//     }
-// }
