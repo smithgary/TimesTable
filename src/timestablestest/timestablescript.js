@@ -130,13 +130,14 @@ function addVisibleTable(){
     let row; //table row
     let cell; // cell within row
 
+    let tableId;    // id for cell for easy reference later (background colour etc.)
     if (selectedOptions.length > 0) {
         row = [];
         cell = [];
 
         tab = document.createElement('table');
         tab.setAttribute('id', 'newtable');
-        tab.setAttribute('border',1);
+        tab.setAttribute('border', 1);
         tbo = document.createElement('tbody');
 
         for (let c = 0; c < selectedOptions.length; c++) {
@@ -146,6 +147,7 @@ function addVisibleTable(){
                 let l = k + 1;
                 cell[k] = document.createElement('td');
                 let cont = document.createTextNode(selectedOptions[c] + ' x ' + l);
+                cell[k].setAttribute("id", selectedOptions[c] + "_" + l);
                 cell[k].appendChild(cont);
                 row[c].appendChild(cell[k]);
             }
@@ -245,9 +247,21 @@ function updateStatus(){
      */
     let outputMessage;
     let found = getCurrentQuestion();
-    if (found.answeredCorrectly && found.answeredInTime){outputMessage = "Correct!, well done!";}
-    if (found.answeredCorrectly && !found.answeredInTime){outputMessage = "Correct, just took a bit longer";}
-    if (!found.answeredCorrectly){outputMessage = "Sorry, wrong answer";}
+    console.log(found);
+    let currentCell = getTableCell();
+    if (found.answeredCorrectly === true && found.answeredInTime === true){
+        outputMessage = "Correct!, well done!";
+        currentCell.style.backgroundColor = "green";
+        }
+    if (found.answeredCorrectly === true && found.answeredInTime === false){
+        outputMessage = "Correct, just took a bit longer";
+        currentCell.style.backgroundColor = "orange";
+    }
+    if (found.answeredCorrectly === false){
+        outputMessage = "Sorry, wrong answer";
+        currentCell.style.backgroundColor = "red";
+    }
+    //Get statistics
     let numberAnswered = outStandingQuestions.length - getNumberOfRemainingQuestions();
     let percentageAnswered = 100 * numberAnswered / outStandingQuestions.length;
     let numberCorrect = outStandingQuestions.filter(function (question) {
@@ -257,8 +271,39 @@ function updateStatus(){
     let successMessage = outputMessage + "<br>Answered: " + numberAnswered + ", " + percentageAnswered + "complete. <br> Correct: " + numberCorrect + ", " + percentageCorrect + " perc";
     if (found.answered === false) { document.getElementById("statusText").innerHTML = "Question not yet answered"}
     if (found.answered === true) { document.getElementById("statusText").innerHTML = successMessage };
+    let elem = document.getElementById("myBar");
+    elem = percentageAnswered; //Not working as expected..!
 }
 
+function getTableCell(){
+    let found = getCurrentQuestion();
+    let tableCell = document.getElementById(found.mapKey);
+    return tableCell;
+
+    // let b = document.getElementById("colr").value;
+    // let x = document.getElementById('mytable').getElementsByTagName('td');
+    // if(b < 10) x[b].style.backgroundColor = "yellow";
+    // if(b < 20 && b > 10) x[b].style.backgroundColor = "green";
+    // if(b > 20) x[b].style.backgroundColor = "red";
+}
+// var i = 0;
+// function move() {
+//     if (i == 0) {
+//         i = 1;
+//         var elem = document.getElementById("myBar");
+//         var width = 1;
+//         var id = setInterval(frame, 10);
+//         function frame() {
+//             if (width >= 100) {
+//                 clearInterval(id);
+//                 i = 0;
+//             } else {
+//                 width++;
+//                 elem.style.width = width + "%";
+//             }
+//         }
+//     }
+// }
 function getCurrentQuestion(){
     let found = outStandingQuestions.find(element => element.mapKey === currentQuestionId);
     return found;
