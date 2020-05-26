@@ -261,7 +261,8 @@ function updateStatus(){
     if (found.answered === false) { document.getElementById("statusText").innerHTML = "Question not yet answered"}
     if (found.answered === true) { document.getElementById("statusText").innerHTML = successMessage };
     let elem = document.getElementById("myBar");
-    elem = percentageAnswered; //Not working as expected..!
+    elem.style.width = Math.floor(percentageAnswered)+ '%'; //Not working as expected..!
+    elem.innerHTML = Math.floor(percentageAnswered) * 1 + '%';
 }
 
 function getTableCell(){
