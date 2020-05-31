@@ -1,7 +1,10 @@
 /**
  * Written by Gary Smith, gary@meteorsoftware.co.uk
+ * Load in jQuery
+ * @type {HTMLScriptElement}
  */
-    document.title = "Times table by Gary";
+    document.title = "Number Bonds by Gary";
+
     /**
      * Global variables, used across functions
      */
@@ -20,17 +23,20 @@
 function startUp(){
 
     let mapKeyId;
-    let jOffset;
+    let compliment;
     for (let i = 0; i < selectedOptions.length; i++) {
-
-        for (let j = 0; j < maxTimes; j++) {
-            jOffset = j + 1;
-            mapKeyId = selectedOptions[i] + "_" + jOffset;
+        for (let j = selectedOptions[i]; j > 0; j--) {
+            compliment = selectedOptions[i] - j;
+            mapKeyId = selectedOptions[i] - compliment + "_" + compliment;
+            console.log("MKID:" + mapKeyId);
+            console.log("j = " + j);
+            console.log("compliment: " + compliment);
+            console.log("selectedOptions[i]" + selectedOptions[i]);
             let q = {
                 mapKey: mapKeyId,
-                optionMultiple: selectedOptions[i],
-                rangeMultiple: jOffset,
-                correctAnswer: selectedOptions[i] * jOffset,
+                optionNumber: j,
+                rangeNumber: compliment,
+                correctAnswer: j + compliment,
                 responseAnswer: 0,
                 asked: false,
                 answered: false,
@@ -43,7 +49,8 @@ function startUp(){
         }
     }
     let input = document.getElementById("answer");
-    // Execute a function when the user releases a key on the keyboard
+
+// Execute a function when the user releases a key on the keyboard
     input.addEventListener("keyup", function(event) {
         // Number 13 is the "Enter" key on the keyboard
         if (event.keyCode === 13) {
@@ -60,7 +67,7 @@ function startUp(){
  * Created 23rd May 2020
  */
 function populateOptions(){
-    var options = ["2 Times", "3 Times", "4 Times", "5 Times", "6 Times", "7 Times", "8 Times", "9 Times", "10 Times", "11 Times", "12 Times"];
+    var options = ["5 Bonds", "6 Bonds", "7 Bonds", "8 Bonds", "9 Bonds", "10 Bonds", "11 Bonds", "12 Bonds"];
     var optionsDiv = document.getElementById("chkBoxes");
 
     for(var i=0; i < options.length; i++){
@@ -69,14 +76,14 @@ function populateOptions(){
         var idLbl = document.createElement("id");
         checkBox.type = "checkbox";
         checkBox.value = options[i];
-        checkBox.id = "chkBoxTimes" + (i + 2);
+        checkBox.id = "chkBoxBond" + (i + 5);   //Starts at 5..
         optionsDiv.appendChild(checkBox);
         optionsDiv.appendChild(label);
         optionsDiv.appendChild(idLbl);
         label.appendChild(document.createTextNode(options[i]));
     }
     document.getElementById("initialChoices").style.display = "block";
-    document.getElementById("maxNumber").value = 12;
+    //document.getElementById("maxNumber").value = 12;
 }
 
 /**
@@ -84,30 +91,19 @@ function populateOptions(){
  * Created 23rd May 2020
  */
 function finaliseChoices(){
-    //TODO replace with dynamic fill
-    questionOptions[2] = document.getElementById("chkBoxTimes2");
-    questionOptions[3] = document.getElementById("chkBoxTimes3");
-    questionOptions[4] = document.getElementById("chkBoxTimes4");
-    questionOptions[5] = document.getElementById("chkBoxTimes5");
-    questionOptions[6] = document.getElementById("chkBoxTimes6");
-    questionOptions[7] = document.getElementById("chkBoxTimes7");
-    questionOptions[8] = document.getElementById("chkBoxTimes8");
-    questionOptions[9] = document.getElementById("chkBoxTimes9");
-    questionOptions[10] = document.getElementById("chkBoxTimes10");
-    questionOptions[11] = document.getElementById("chkBoxTimes11");
-    questionOptions[12] = document.getElementById("chkBoxTimes12");
+    let firstOption = 5;
+    let lastOption = 12;
+    for(let i=firstOption; i<(lastOption + 1); i++){
+        let chkBoxString = "chkBoxBond" + i;
+        questionOptions[i] = document.getElementById(chkBoxString);
+    }
 
-    let maxEntered = document.getElementById("maxNumber").value;
-    maxTimes = parseInt(maxEntered);
-
-    let maxTimesOffset = maxTimes + 1;
     let indx = 0;
-    let strg = ""; //testing remove later.
-     for(let k=2; k< maxTimesOffset; k++){
+     for(let k=firstOption; k<(lastOption + 1); k++){
          if (questionOptions[k].checked){
              selectedOptions[indx]=k;
+             console.log(selectedOptions[indx]);
              indx += 1;
-
          }
      }
     //Hide the div where initial choices were made.
@@ -136,12 +132,10 @@ function addVisibleTable(){
 
         for (let c = 0; c < selectedOptions.length; c++) {
             row[c] = document.createElement('tr');
-
-            for (let k = 0; k < maxTimes; k++) {
-                let l = k + 1;
+            for(let k=selectedOptions[c]; k > 0; k--){
                 cell[k] = document.createElement('td');
-                let cont = document.createTextNode(selectedOptions[c] + ' x ' + l);
-                cell[k].setAttribute("id", selectedOptions[c] + "_" + l);
+                let cont = document.createTextNode(k + ' + ' + (selectedOptions[c] - k));
+                cell[k].setAttribute("id", k + '_' + (selectedOptions[c] - k));
                 cell[k].appendChild(cont);
                 row[c].appendChild(cell[k]);
             }
@@ -172,7 +166,7 @@ function generateQuestionFromUnanswered(){
         console.log(mKId);
         //Set outStandingQuestions, with mapKey = mkId, asked = true;
 
-        document.getElementById("questionText").innerHTML = randomQuestion.optionMultiple + ' X ' + randomQuestion.rangeMultiple;
+        document.getElementById("questionText").innerHTML = randomQuestion.optionNumber + ' + ' + randomQuestion.rangeNumber;
 
         //Update outStandingQuestions, set asked = true.
         let found = outStandingQuestions.find(element => element.mapKey === mKId);
@@ -207,7 +201,6 @@ function getRandomItem(set) {
 function calculate(){
     let ans = document.getElementById("answer").value;
 
-    let x = document.getElementById('mytable').getElementsByTagName('td');
     //Get the current question being answered
     let found = getCurrentQuestion();
         found.answered = true;
@@ -263,7 +256,7 @@ function updateStatus(){
     if (found.answered === false) { document.getElementById("statusText").innerHTML = "Question not yet answered"}
     if (found.answered === true) { document.getElementById("statusText").innerHTML = successMessage };
     let elem = document.getElementById("myBar");
-    elem.style.width = Math.floor(percentageAnswered)+ '%'; //Not working as expected..!
+    elem.style.width = Math.floor(percentageAnswered) + '%';
     elem.innerHTML = Math.floor(percentageAnswered) * 1 + '%';
     let correctBar = document.getElementById("correctBar");
     correctBar.style.width = Math.floor(percentageCorrect) + '%';
